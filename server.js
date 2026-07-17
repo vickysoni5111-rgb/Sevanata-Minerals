@@ -7,6 +7,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// 🚀 होम रूट (Home Root) - यह "Cannot GET /" एरर को फिक्स करेगा
+app.get('/', (req, res) => {
+  res.send('🚀 Sevanta Minerals Backend is Live and Running!');
+});
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -185,7 +190,7 @@ app.post('/api/send-lead', async (req, res) => {
               <strong>Status:</strong> <span class="status-pill">Active Verified Lead</span>
             </div>
             <div class="meta-right">
-              <strong>Date/Time:</strong> ${currentDateTime}
+              <strong>Date/Time:</strong> \${currentDateTime}
             </div>
           </div>
 
@@ -195,30 +200,30 @@ app.post('/api/send-lead', async (req, res) => {
             <tbody>
               <tr>
                 <td class="label-column">👤 Client Name</td>
-                <td class="value-column" style="font-weight: 600;">${name}</td>
+                <td class="value-column" style="font-weight: 600;">\${name}</td>
               </tr>
               <tr>
                 <td class="label-column">📧 Email Address</td>
                 <td class="value-column">
-                  <a href="mailto:${email}" style="color: #9c6f3a; text-decoration: none; font-weight: 600;">${email}</a>
+                  <a href="mailto:\${email}" style="color: #9c6f3a; text-decoration: none; font-weight: 600;">\${email}</a>
                 </td>
               </tr>
               <tr>
                 <td class="label-column">📞 Contact Number</td>
-                <td class="value-column">${countryCode ? countryCode + ' ' : ''}${phone}</td>
+                <td class="value-column">\${countryCode ? countryCode + ' ' : ''}\${phone}</td>
               </tr>
               <tr>
                 <td class="label-column">🏢 Company Name</td>
-                <td class="value-column">${companyName || '<em>Not Provided</em>'}</td>
+                <td class="value-column">\${companyName || '<em>Not Provided</em>'}</td>
               </tr>
               <tr>
                 <td class="label-column">🛠️ Service/Product</td>
-                <td class="value-column service-highlight">${service || 'General Enquiry'}</td>
+                <td class="value-column service-highlight">\${service || 'General Enquiry'}</td>
               </tr>
               <tr>
                 <td class="label-column">💰 Estimated Budget</td>
                 <td class="value-column">
-                  <span class="budget-tag">${budget || 'N/A'}</span>
+                  <span class="budget-tag">\${budget || 'N/A'}</span>
                 </td>
               </tr>
             </tbody>
@@ -226,7 +231,7 @@ app.post('/api/send-lead', async (req, res) => {
 
           <div class="section-heading">📝 Detailed Requirements</div>
           <div class="requirements-box">
-            ${projectDetails || 'No specific technical parameters described.'}
+            \${projectDetails || 'No specific technical parameters described.'}
           </div>
         </div>
 
@@ -240,7 +245,7 @@ app.post('/api/send-lead', async (req, res) => {
   `;
 
   const mailOptions = {
-    from: `"${name}" <${email}>`,
+    from: `"\${name}" <\${email}>`,
     to: 'Sevantaminerals@gmail.com', // 💡 यहाँ भी आपका ईमेल सेट है
     replyTo: email,
     subject: emailSubject,
@@ -257,4 +262,4 @@ app.post('/api/send-lead', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server fully operational on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server fully operational on port \${PORT}`));
