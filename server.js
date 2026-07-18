@@ -5,18 +5,36 @@ require('dotenv').config();
 
 const app = express();
 
+// 🎯 CORS FIX: Vercel har naye deployment pe alag URL deta hai
+// (jaise -seven.vercel.app, -y737-mu.vercel.app waghera).
+// Isliye ek fixed URL allow karne ki jagah, hum kisi bhi
+// *.vercel.app subdomain ko allow kar rahe hain — plus apna
+// custom domain jab wo ready ho jaye, wo bhi yahan add kar dena.
+const allowedOrigins = [
+  /^https:\/\/.*\.vercel\.app$/,   // sabhi Vercel preview + production URLs
+  'http://localhost:5173',         // local Vite dev server
+  'http://localhost:3000',
+  // 'https://sevantaminerals.com', // 👈 apna final custom domain buy karke yahan uncomment/add karo
+];
 
-
-
-// यहाँ अपनी Vercel वाली वेबसाइट का URL डालें
 app.use(cors({
-  origin: "https://sevanta-minerals-frontend-y737-mu.vercel.app", 
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
+  origin: function (origin, callback) {
+    // Postman jaise tools se (no origin) request allow karo
+    if (!origin) return callback(null, true);
+    const isAllowed = allowedOrigins.some((pattern) =>
+      pattern instanceof RegExp ? pattern.test(origin) : pattern === origin
+    );
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS: ' + origin));
+    }
+  }
 }));
+
 app.use(express.json());
 
-// 🚀 होम रूट (Home Root)
+// 🚀 होम रूट (Home Root) - यह "Cannot GET /" एरर को फिक्स करेगा
 app.get('/', (req, res) => {
   res.send('🚀 Sevanta Minerals Backend is Live and Running!');
 });
@@ -24,8 +42,8 @@ app.get('/', (req, res) => {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'Sevantaminerals@gmail.com', 
-    pass: process.env.EMAIL_PASS   
+    user: 'Sevantaminerals@gmail.com', // 💡 यहाँ सेंडर ईमेल डायरेक्ट सेट कर दिया है
+    pass: process.env.EMAIL_PASS   // आपकी Gmail का 16-digit App Password (.env फ़ाइल से लोड होगा)
   }
 });
 
@@ -34,10 +52,6 @@ app.post('/api/send-lead', async (req, res) => {
   const currentDateTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
 
   const emailSubject = `💎 B2B Lead Alert: ${name} | ${service || 'New Request'}`;
-
-  // ✨ CSS की % वाली गड़बड़ को रोकने के लिए वेरिएबल्स बना दिए
-  const bgPercent25 = "25%";
-  const bgPercent100 = "100%";
 
   const emailHtmlBody = `
     <!DOCTYPE html>
@@ -48,7 +62,7 @@ app.post('/api/send-lead', async (req, res) => {
       <style>
         body {
           font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-          background: #f4f1ea linear-gradient(135deg, #f5efe6 ${bgPercent25}, #eadecc ${bgPercent100});
+          background: #f4f1ea linear-gradient(135deg, #f5efe6 25%, #eadecc 100%);
           margin: 0;
           padding: 40px 15px;
           -webkit-font-smoothing: antialiased;
@@ -259,7 +273,7 @@ app.post('/api/send-lead', async (req, res) => {
 
   const mailOptions = {
     from: `"${name}" <${email}>`,
-    to: 'Sevantaminerals@gmail.com', 
+    to: 'Sevantaminerals@gmail.com', // 💡 यहाँ भी आपका ईमेल सेट है
     replyTo: email,
     subject: emailSubject,
     html: emailHtmlBody
