@@ -97,7 +97,7 @@ app.post('/api/send-lead', async (req, res) => {
       },
       body: JSON.stringify({
         from: 'Sevanta Minerals <onboarding@resend.dev>', // domain verify karne ke baad apna email use karna
-        to: ['vickysoni5111@gmail.com'], // ⚠️ TEMPORARY - domain verify karne ke baad Sevantaminerals@gmail.com kar dena
+        to: ['Sevantaminerals@gmail.com'], // ⚠️ TEMPORARY - domain verify karne ke baad Sevantaminerals@gmail.com kar dena
         reply_to: email,
         subject: emailSubject,
         html: emailHtmlBody,
