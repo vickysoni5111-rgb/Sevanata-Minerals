@@ -4,10 +4,17 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+
+
+// यहाँ अपनी Vercel वाली वेबसाइट का URL डालें
+app.use(cors({
+  origin: "https://sevanta-minerals-frontend-y737-mu.vercel.app", 
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 
-// 🚀 होम रूट (Home Root) - यह "Cannot GET /" एरर को फिक्स करेगा
+// 🚀 होम रूट (Home Root)
 app.get('/', (req, res) => {
   res.send('🚀 Sevanta Minerals Backend is Live and Running!');
 });
@@ -15,8 +22,8 @@ app.get('/', (req, res) => {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'Sevantaminerals@gmail.com', // 💡 यहाँ सेंडर ईमेल डायरेक्ट सेट कर दिया है
-    pass: process.env.EMAIL_PASS   // आपकी Gmail का 16-digit App Password (.env फ़ाइल से लोड होगा)
+    user: 'Sevantaminerals@gmail.com', 
+    pass: process.env.EMAIL_PASS   
   }
 });
 
@@ -25,6 +32,10 @@ app.post('/api/send-lead', async (req, res) => {
   const currentDateTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
 
   const emailSubject = `💎 B2B Lead Alert: ${name} | ${service || 'New Request'}`;
+
+  // ✨ CSS की % वाली गड़बड़ को रोकने के लिए वेरिएबल्स बना दिए
+  const bgPercent25 = "25%";
+  const bgPercent100 = "100%";
 
   const emailHtmlBody = `
     <!DOCTYPE html>
@@ -35,7 +46,7 @@ app.post('/api/send-lead', async (req, res) => {
       <style>
         body {
           font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-          background: #f4f1ea linear-gradient(135deg, #f5efe6 25%, #eadecc 100%);
+          background: #f4f1ea linear-gradient(135deg, #f5efe6 ${bgPercent25}, #eadecc ${bgPercent100});
           margin: 0;
           padding: 40px 15px;
           -webkit-font-smoothing: antialiased;
@@ -190,7 +201,7 @@ app.post('/api/send-lead', async (req, res) => {
               <strong>Status:</strong> <span class="status-pill">Active Verified Lead</span>
             </div>
             <div class="meta-right">
-              <strong>Date/Time:</strong> \${currentDateTime}
+              <strong>Date/Time:</strong> ${currentDateTime}
             </div>
           </div>
 
@@ -200,30 +211,30 @@ app.post('/api/send-lead', async (req, res) => {
             <tbody>
               <tr>
                 <td class="label-column">👤 Client Name</td>
-                <td class="value-column" style="font-weight: 600;">\${name}</td>
+                <td class="value-column" style="font-weight: 600;">${name}</td>
               </tr>
               <tr>
                 <td class="label-column">📧 Email Address</td>
                 <td class="value-column">
-                  <a href="mailto:\${email}" style="color: #9c6f3a; text-decoration: none; font-weight: 600;">\${email}</a>
+                  <a href="mailto:${email}" style="color: #9c6f3a; text-decoration: none; font-weight: 600;">${email}</a>
                 </td>
               </tr>
               <tr>
                 <td class="label-column">📞 Contact Number</td>
-                <td class="value-column">\${countryCode ? countryCode + ' ' : ''}\${phone}</td>
+                <td class="value-column">${countryCode ? countryCode + ' ' : ''}${phone}</td>
               </tr>
               <tr>
                 <td class="label-column">🏢 Company Name</td>
-                <td class="value-column">\${companyName || '<em>Not Provided</em>'}</td>
+                <td class="value-column">${companyName || '<em>Not Provided</em>'}</td>
               </tr>
               <tr>
                 <td class="label-column">🛠️ Service/Product</td>
-                <td class="value-column service-highlight">\${service || 'General Enquiry'}</td>
+                <td class="value-column service-highlight">${service || 'General Enquiry'}</td>
               </tr>
               <tr>
                 <td class="label-column">💰 Estimated Budget</td>
                 <td class="value-column">
-                  <span class="budget-tag">\${budget || 'N/A'}</span>
+                  <span class="budget-tag">${budget || 'N/A'}</span>
                 </td>
               </tr>
             </tbody>
@@ -231,7 +242,7 @@ app.post('/api/send-lead', async (req, res) => {
 
           <div class="section-heading">📝 Detailed Requirements</div>
           <div class="requirements-box">
-            \${projectDetails || 'No specific technical parameters described.'}
+            ${projectDetails || 'No specific technical parameters described.'}
           </div>
         </div>
 
@@ -245,8 +256,8 @@ app.post('/api/send-lead', async (req, res) => {
   `;
 
   const mailOptions = {
-    from: `"\${name}" <\${email}>`,
-    to: 'Sevantaminerals@gmail.com', // 💡 यहाँ भी आपका ईमेल सेट है
+    from: `"${name}" <${email}>`,
+    to: 'Sevantaminerals@gmail.com', 
     replyTo: email,
     subject: emailSubject,
     html: emailHtmlBody
@@ -262,4 +273,4 @@ app.post('/api/send-lead', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server fully operational on port \${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server fully operational on port ${PORT}`));
