@@ -6,6 +6,8 @@ require('dotenv').config();
 const app = express();
 
 
+
+
 // यहाँ अपनी Vercel वाली वेबसाइट का URL डालें
 app.use(cors({
   origin: "https://sevanta-minerals-frontend-y737-mu.vercel.app", 
