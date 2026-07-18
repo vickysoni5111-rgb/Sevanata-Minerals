@@ -39,12 +39,18 @@ app.get('/', (req, res) => {
   res.send('🚀 Sevanta Minerals Backend is Live and Running!');
 });
 
+// 🎯 FIX: Render ka network kabhi-kabhi Gmail SMTP se IPv6 pe connect karne
+// ki koshish karta hai jo "ENETUNREACH" error deta hai. host/port explicitly
+// set karke aur family: 4 (IPv4 force) add karke ye fix ho jaata hai.
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // true for port 465
   auth: {
     user: 'Sevantaminerals@gmail.com', // 💡 यहाँ सेंडर ईमेल डायरेक्ट सेट कर दिया है
     pass: process.env.EMAIL_PASS   // आपकी Gmail का 16-digit App Password (.env फ़ाइल से लोड होगा)
-  }
+  },
+  family: 4 // 👈 IPv4 force — ENETUNREACH error fix karta hai
 });
 
 app.post('/api/send-lead', async (req, res) => {
